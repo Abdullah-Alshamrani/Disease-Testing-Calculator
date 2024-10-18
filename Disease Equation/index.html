@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Formula JavaScript Code Library</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Disease Testing Formula Library</h1>
+        <p>This library includes JavaScript code for key formulas used in disease testing interpretation. Click "Show Code" to view the JavaScript code for each formula and "Copy Code" to copy it for use in your projects.</p>
+
+        <div class="formula">
+            <h2>Formula 1: True Positive (TP)</h2>
+            <p>Formula: <strong>TP = Population × Prevalence × Sensitivity</strong></p>
+            <button onclick="showCode('codeTP')">Show Code</button>
+            <pre id="codeTP" class="code-snippet">
+                const truePositive = (population, prevalence, sensitivity) => {
+                    return population * prevalence * sensitivity;
+                };
+                console.log(truePositive(10000, 0.8, 0.6)); // Example Output: 4800
+            </pre>
+            <button onclick="copyCode('codeTP')">Copy Code</button>
+        </div>
+
+        <div class="formula">
+            <h2>Formula 2: False Positive (FP)</h2>
+            <p>Formula: <strong>FP = Population × (1 - Prevalence) × (1 - Specificity)</strong></p>
+            <button onclick="showCode('codeFP')">Show Code</button>
+            <pre id="codeFP" class="code-snippet">
+                const falsePositive = (population, prevalence, specificity) => {
+                    return population * (1 - prevalence) * (1 - specificity);
+                };
+                console.log(falsePositive(10000, 0.8, 0.8)); // Example Output: 400
+            </pre>
+            <button onclick="copyCode('codeFP')">Copy Code</button>
+        </div>
+
+        <div class="formula">
+            <h2>Formula 3: Positive Predictive Value (PPV)</h2>
+            <p>Formula: <strong>PPV = TP / (TP + FP)</strong></p>
+            <button onclick="showCode('codePPV')">Show Code</button>
+            <pre id="codePPV" class="code-snippet">
+                const ppv = (tp, fp) => {
+                    return (tp / (tp + fp)) * 100;
+                };
+                console.log(ppv(4800, 400)); // Example Output: 92.31
+            </pre>
+            <button onclick="copyCode('codePPV')">Copy Code</button>
+        </div>
+
+        <div class="formula">
+            <h2>Formula 4: Negative Predictive Value (NPV)</h2>
+            <p>Formula: <strong>NPV = TN / (TN + FN)</strong></p>
+            <button onclick="showCode('codeNPV')">Show Code</button>
+            <pre id="codeNPV" class="code-snippet">
+                const npv = (tn, fn) => {
+                    return (tn / (tn + fn)) * 100;
+                };
+                console.log(npv(1600, 3200)); // Example Output: 33.33
+            </pre>
+            <button onclick="copyCode('codeNPV')">Copy Code</button>
+        </div>
+
+        <div class="formula">
+            <h2>Formula 5: Accuracy</h2>
+            <p>Formula: <strong>Accuracy = (TP + TN) / Population</strong></p>
+            <button onclick="showCode('codeAccuracy')">Show Code</button>
+            <pre id="codeAccuracy" class="code-snippet">
+                const accuracy = (tp, tn, population) => {
+                    return ((tp + tn) / population) * 100;
+                };
+                console.log(accuracy(4800, 1600, 10000)); // Example Output: 64.0
+            </pre>
+            <button onclick="copyCode('codeAccuracy')">Copy Code</button>
+        </div>
+
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
