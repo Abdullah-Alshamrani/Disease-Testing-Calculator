@@ -1,0 +1,77 @@
+<!--Developer: Abdullah Alshamrani-->
+<!--10/17/2024-->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Disease Testing Calculator with CIs</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Disease Testing Interpretation Calculator</h1>
+
+        <div class="content">
+            <div class="left-section">
+                <p>This calculator allows you to input population, prevalence, sensitivity, and specificity values, and it calculates true positive, false positive, PPV, NPV, and likelihood ratios (LR+ and LR-), along with their confidence intervals (CIs).</p>
+
+                <form id="calculatorForm">
+                    <div class="input-group">
+                        <label for="population">Population:</label>
+                        <input type="number" id="population" placeholder="Enter population" required>
+                    </div>
+                    <div class="input-group">
+                        <label for="prevalence">Prevalence (%):</label>
+                        <input type="number" id="prevalence" step="0.1" placeholder="Enter prevalence" required>
+                    </div>
+                    <div class="input-group">
+                        <label for="sensitivity">Sensitivity (%):</label>
+                        <input type="number" id="sensitivity" step="0.1" placeholder="Enter sensitivity" required>
+                    </div>
+                    <div class="input-group">
+                        <label for="specificity">Specificity (%):</label>
+                        <input type="number" id="specificity" step="0.1" placeholder="Enter specificity" required>
+                    </div>
+                    <div class="input-group">
+                        <label for="confidence">Confidence Level (%):</label>
+                        <input type="number" id="confidence" value="95" step="0.1" required>
+                    </div>
+
+                    <button type="button" id="calculateBtn">Calculate</button>
+                </form>
+
+                <div id="results">
+                    <h2>Results:</h2>
+                    <p id="truePositive">True Positive: </p>
+                    <p id="falsePositive">False Positive: </p>
+                    <p id="falseNegative">False Negative: </p>
+                    <p id="trueNegative">True Negative: </p>
+                    <p id="ppv">Positive Predictive Value (PPV): </p>
+                    <p id="npv">Negative Predictive Value (NPV): </p>
+                    <p id="lrPositive">Positive Likelihood Ratio (LR+): </p>
+                    <p id="lrNegative">Negative Likelihood Ratio (LR-): </p>
+                    <p id="accuracy">Accuracy: </p>
+                    <h3>Confidence Intervals:</h3>
+                    <p id="seLRP">SE LR+: </p>
+                    <p id="ciLRP">LR+ CI: </p>
+                    <p id="seLRN">SE LR-: </p>
+                    <p id="ciLRN">LR- CI: </p>
+                </div>
+            </div>
+
+            <div class="right-section">
+                <h3>Interpretation Guide</h3>
+                <p><strong>LR+ = 3</strong> means that a positive test result is 3 times more likely to occur in someone with the condition than in someone without the condition.</p>
+                <p><strong>LR- = 0.5</strong> means that a negative test result is 0.5 times as likely to occur in someone with the condition than in someone without the condition.</p>
+                <p><strong>PPV = 92.3%</strong> suggests that a person with a positive test result has a 92.3% chance of truly having the disease being tested for.</p>
+                <p><strong>NPV = 33.3%</strong> suggests that a person with a negative test result has a 33.3% chance of truly not having the disease being tested for.</p>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
