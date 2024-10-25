@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Disease Testing Calculator with PDF Export</title>
+    <style>
+        .main-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 20px;
+            background-color: #f4f4f4;
+        }
+        h1 { text-align: center; color: #333; margin-bottom: 20px; }
+        .content {
+            display: flex;
+            flex-direction: row;
+            justify-content: center;
+            align-items: flex-start;
+            gap: 20px;
+            max-width: 1200px;
+            width: 100%;
+        }
+        .left-section, .center-section, .right-section {
+            background-color: #f0f8ff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        .left-section { width: 30%; }
+        .center-section { width: 35%; }
+        .right-section { width: 30%; background-color: #e6f2ff; }
+        .explanation-section h2, .explanation-section h3 { color: #0056b3; }
+        .explanation-section p { margin: 10px 0; line-height: 1.6; }
+        #calculatorForm { display: flex; flex-direction: column; }
+        .input-group { margin-bottom: 10px; }
+        button {
+            margin-top: 15px;
+            padding: 10px;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+        button:hover { background-color: #218838; }
+        #results { margin-top: 20px; }
+        .open-whiteboard-btn {
+            margin-top: 20px;
+            padding: 10px 15px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        .open-whiteboard-btn:hover { background-color: #0056b3; }
+        .whiteboard-modal {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 80%;
+            height: 80%;
+            background-color: rgba(0, 0, 0, 0.8);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+        }
+        .whiteboard-header {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            display: flex;
+            gap: 10px;
+        }
+        .close-whiteboard-btn, .clear-whiteboard-btn {
+            padding: 5px 10px;
+            background-color: #ff4d4d;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .close-whiteboard-btn:hover, .clear-whiteboard-btn:hover { background-color: #cc0000; }
+        #whiteboardCanvas {
+            background-color: white;
+            width: 100%;
+            height: 100%;
+            border: 2px solid #000;
+            cursor: crosshair;
+        }
+        #resultsChartContainer {
+            margin-top: 30px;
+            width: 100%;
+            max-width: 600px;
+        }
+        .hide-for-pdf { display: inline-block; }
+    </style>
+    <!-- Add jQuery, Chart.js, and jsPDF -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.4.0/jspdf.umd.min.js"></script>
+</head>
+<body>
+    <div class="main-container">
+        <h1>Disease Testing Interpretation Calculator</h1>
+
+        <!-- Whiteboard Button -->
+        <button id="openWhiteboard" class="open-whiteboard-btn">Open Whiteboard</button>
+
+        <div class="content">
+            <!-- Left Section with Detailed Explanation -->
+            <div class="left-section">
+                <div class="explanation-section">
+                    <h2>Understanding the Impact of Each Variable</h2>
+                    <h3>1. Population</h3>
+                    <p><strong>Contextual Overview:</strong> Population size reflects the total number of individuals being tested. Adjusting this variable changes the raw counts of true positives, false positives, true negatives, and false negatives. However, predictive values like PPV and NPV remain unaffected as they are based on proportions.</p>
+                    <p><strong>Practical Implication:</strong> Doubling the population (e.g., from 10,000 to 20,000) doubles the true positives while keeping the PPV constant.</p>
+                    <p><strong>Key Formula:</strong> True Positive = Population × Prevalence × Sensitivity</p>
+
+                    <h3>2. Prevalence (%)</h3>
+                    <p><strong>Contextual Overview:</strong> Prevalence represents the percentage of the population with the disease. It directly impacts true positives and false negatives.</p>
+                    <p><strong>Practical Implication:</strong> An increase in prevalence raises true positives, improving PPV but potentially reducing NPV as there are fewer non-disease cases.</p>
+                    <p><strong>Key Formula:</strong> Disease Positive = Population × Prevalence</p>
+
+                    <h3>3. Sensitivity (%)</h3>
+                    <p><strong>Contextual Overview:</strong> Sensitivity measures the test’s ability to detect true positives. A higher sensitivity reduces false negatives and improves PPV.</p>
+                    <p><strong>Practical Implication:</strong> Increasing sensitivity from 60% to 80% leads to more true positives, making a positive result more reliable.</p>
+                    <p><strong>Key Formula:</strong> True Positive = Disease Positive × Sensitivity</p>
+
+                    <h3>4. Specificity (%)</h3>
+                    <p><strong>Contextual Overview:</strong> Specificity reflects the ability of the test to correctly identify non-disease cases. Increasing specificity reduces false positives and enhances NPV.</p>
+                    <p><strong>Practical Implication:</strong> A rise in specificity from 70% to 90% increases the true negative count and improves NPV.</p>
+                    <p><strong>Key Formula:</strong> True Negative = Disease Negative × Specificity</p>
+
+                    <h3>5. Confidence Level (%)</h3>
+                    <p><strong>Contextual Overview:</strong> Confidence level indicates the certainty of calculated likelihood ratios and other metrics.</p>
+                    <p><strong>Practical Implication:</strong> A higher confidence level (e.g., 99%) widens the confidence intervals, offering more conservative estimates.</p>
+                    <p><strong>Key Formula:</strong> CI LR+ = [exp(log(LR+) - Z × SE), exp(log(LR+) + Z × SE)]</p>
+                </div>
+            </div>
+
+            <!-- Center Form Section -->
+            <div class="center-section">
+                <p>This calculator allows you to input population, prevalence, sensitivity, specificity, and confidence level, calculating true positives, false positives, PPV, NPV, and likelihood ratios (LR+ and LR-), along with their confidence intervals (CIs).</p>
+                <form id="calculatorForm">
+                    <div class="input-group">
+                        <label for="population">Population:</label>
+                        <input type="number" id="population" placeholder="Enter population" required>
+                    </div>
+                    <div class="input-group">
+                        <label for="prevalence">Prevalence (%):</label>
+                        <input type="number" id="prevalence" step="0.1" placeholder="Enter prevalence" required>
+                    </div>
+                    <div class="input-group">
+                        <label for="sensitivity">Sensitivity (%):</label>
+                        <input type="number" id="sensitivity" step="0.1" placeholder="Enter sensitivity" required>
+                    </div>
+                    <div class="input-group">
+                        <label for="specificity">Specificity (%):</label>
+                        <input type="number" id="specificity" step="0.1" placeholder="Enter specificity" required>
+                    </div>
+                    <div class="input-group">
+                        <label for="confidence">Confidence Level (%):</label>
+                        <input type="number" id="confidence" value="95" step="0.1" required>
+                    </div>
+                    <button type="button" id="calculateBtn">Calculate</button>
+                </form>
+
+                <!-- Results Section -->
+                <div id="results">
+                    <h2>Results:</h2>
+                    <p id="truePositive">True Positive: </p>
+                    <p id="falsePositive">False Positive: </p>
+                    <p id="falseNegative">False Negative: </p>
+                    <p id="trueNegative">True Negative: </p>
+                    <p id="ppv">Positive Predictive Value (PPV): </p>
+                    <p id="npv">Negative Predictive Value (NPV): </p>
+                    <p id="lrPositive">Positive Likelihood Ratio (LR+): </p>
+                    <p id="lrNegative">Negative Likelihood Ratio (LR-): </p>
+                    <p id="accuracy">Accuracy: </p>
+                    <h3>Confidence Intervals:</h3>
+                    <p id="seLRP">SE LR+: </p>
+                    <p id="ciLRP">LR+ CI: </p>
+                    <p id="seLRN">SE LR-: </p>
+                    <p id="ciLRN">LR- CI: </p>
+                    <!-- Download Options -->
+                    <button id="downloadPDF" class="hide-for-pdf">Download PDF</button>
+                </div>
+
+                <!-- Chart for Dynamic Visualization -->
+                <div id="resultsChartContainer">
+                    <canvas id="resultsChart"></canvas>
+                </div>
+            </div>
+
+            <!-- Right Interpretation Guide Section -->
+            <div class="right-section">
+                <h3>Interpretation Guide</h3>
+                <p><strong>LR+ = 3</strong> means that a positive test result is 3 times more likely to occur in someone with the condition than in someone without the condition.</p>
+                <p><strong>LR- = 0.5</strong> means that a negative test result is 0.5 times as likely to occur in someone with the condition than in someone without the condition.</p>
+                <p><strong>PPV = 92.3%</strong> suggests that a person with a positive test result has a 92.3% chance of truly having the disease being tested for.</p>
+                <p><strong>NPV = 33.3%</strong> suggests that a person with a negative test result has a 33.3% chance of truly not having the disease being tested for.</p>
+            </div>
+        </div>
+
+        <!-- Whiteboard Modal -->
+        <div id="whiteboardModal" class="whiteboard-modal">
+            <div class="whiteboard-header">
+                <button id="closeWhiteboard" class="close-whiteboard-btn">X</button>
+                <button id="clearWhiteboard" class="clear-whiteboard-btn">Clear</button>
+            </div>
+            <canvas id="whiteboardCanvas"></canvas>
+        </div>
+    </div>
+
+    <script>
+        $(document).ready(function() {
+            const whiteboardCanvas = document.getElementById('whiteboardCanvas');
+            const ctx = whiteboardCanvas.getContext('2d');
+            let drawing = false;
+
+            whiteboardCanvas.width = 0.8 * window.innerWidth;
+            whiteboardCanvas.height = 0.8 * window.innerHeight;
+
+            $('#openWhiteboard').click(function() { $('#whiteboardModal').show(); });
+            $('#closeWhiteboard').click(function() { $('#whiteboardModal').hide(); });
+            $('#clearWhiteboard').click(function() { ctx.clearRect(0, 0, whiteboardCanvas.width, whiteboardCanvas.height); });
+
+            whiteboardCanvas.addEventListener('mousedown', (e) => { drawing = true; ctx.moveTo(e.offsetX, e.offsetY); });
+            whiteboardCanvas.addEventListener('mousemove', (e) => {
+                if (drawing) { ctx.lineTo(e.offsetX, e.offsetY); ctx.stroke(); }
+            });
+            whiteboardCanvas.addEventListener('mouseup', () => { drawing = false; ctx.beginPath(); });
+
+            $('#calculateBtn').click(function() {
+                let population = parseFloat($('#population').val());
+                let prevalence = parseFloat($('#prevalence').val()) / 100;
+                let sensitivity = parseFloat($('#sensitivity').val()) / 100;
+                let specificity = parseFloat($('#specificity').val()) / 100;
+                let confidence = parseFloat($('#confidence').val()) / 100;
+
+                if (isNaN(population) || isNaN(prevalence) || isNaN(sensitivity) || isNaN(specificity) || isNaN(confidence)) {
+                    alert("Please fill in all fields correctly.");
+                    return;
+                }
+
+                let diseasePositive = population * prevalence;
+                let diseaseNegative = population - diseasePositive;
+                let truePositive = diseasePositive * sensitivity;
+                let falsePositive = diseaseNegative * (1 - specificity);
+                let falseNegative = diseasePositive * (1 - sensitivity);
+                let trueNegative = diseaseNegative * specificity;
+
+                let ppv = (truePositive / (truePositive + falsePositive)) * 100;
+                let npv = (trueNegative / (trueNegative + falseNegative)) * 100;
+                let lrPositive = sensitivity / (1 - specificity);
+                let lrNegative = (1 - sensitivity) / specificity;
+                let accuracy = ((truePositive + trueNegative) / population) * 100;
+
+                // Standard Error (SE) calculations for LR+
+                let seLRP = Math.sqrt((1 - sensitivity) / (sensitivity * truePositive) + (1 - specificity) / (specificity * falsePositive));
+                let ciLRP_lower = Math.exp(Math.log(lrPositive) - 1.96 * seLRP);
+                let ciLRP_upper = Math.exp(Math.log(lrPositive) + 1.96 * seLRP);
+
+                // Standard Error (SE) calculations for LR-
+                let seLRN = Math.sqrt((1 - sensitivity) / (sensitivity * falseNegative) + (1 - specificity) / (specificity * trueNegative));
+                let ciLRN_lower = Math.exp(Math.log(lrNegative) - 1.96 * seLRN);
+                let ciLRN_upper = Math.exp(Math.log(lrNegative) + 1.96 * seLRN);
+
+                $('#truePositive').text(`True Positive: ${Math.round(truePositive)}`);
+                $('#falsePositive').text(`False Positive: ${Math.round(falsePositive)}`);
+                $('#falseNegative').text(`False Negative: ${Math.round(falseNegative)}`);
+                $('#trueNegative').text(`True Negative: ${Math.round(trueNegative)}`);
+                $('#ppv').text(`Positive Predictive Value (PPV): ${ppv.toFixed(2)}%`);
+                $('#npv').text(`Negative Predictive Value (NPV): ${npv.toFixed(2)}%`);
+                $('#lrPositive').text(`Positive Likelihood Ratio (LR+): ${lrPositive.toFixed(2)}`);
+                $('#lrNegative').text(`Negative Likelihood Ratio (LR-): ${lrNegative.toFixed(2)}`);
+                $('#accuracy').text(`Accuracy: ${accuracy.toFixed(2)}%`);
+
+                $('#seLRP').text(`SE LR+: ${seLRP.toFixed(2)}`);
+                $('#ciLRP').text(`LR+ CI: ${ciLRP_lower.toFixed(2)} to ${ciLRP_upper.toFixed(2)}`);
+                $('#seLRN').text(`SE LR-: ${seLRN.toFixed(2)}`);
+                $('#ciLRN').text(`LR- CI: ${ciLRN_lower.toFixed(2)} to ${ciLRN_upper.toFixed(2)}`);
+
+                // Update chart
+                updateChart(ppv, npv, sensitivity * 100, specificity * 100);
+            });
+
+            function updateChart(ppv, npv, sensitivity, specificity) {
+                const ctx = document.getElementById('resultsChart').getContext('2d');
+                new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: ['PPV', 'NPV', 'Sensitivity', 'Specificity'],
+                        datasets: [{
+                            label: 'Results',
+                            data: [ppv, npv, sensitivity, specificity],
+                            backgroundColor: ['rgba(75, 192, 192, 0.6)', 'rgba(255, 99, 132, 0.6)', 'rgba(54, 162, 235, 0.6)', 'rgba(255, 206, 86, 0.6)']
+                        }]
+                    }
+                });
+            }
+
+            // PDF Download
+            $('#downloadPDF').click(function() {
+                $('.hide-for-pdf').hide(); // Hide download buttons
+                const { jsPDF } = window.jspdf;
+                const doc = new jsPDF();
+                doc.text('Disease Testing Calculator Results', 10, 10);
+                doc.text($('#results').text(), 10, 20);
+                doc.save('results.pdf');
+                $('.hide-for-pdf').show(); // Show buttons again
+            });
+        });
+    </script>
+</body>
+</html>
